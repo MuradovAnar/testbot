@@ -5,7 +5,6 @@ require("dotenv").config();
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 async function main() {
-  // const uri = 'mongodb+srv://comedy:0811966anAR95@cluster0.4em1mpd.mongodb.net/comedy?retryWrites=true&w=majority';
   const uri =
     "mongodb+srv://comedyhall:qwerty12345QWERTY@comedyhallcluster.t2gup9r.mongodb.net/?retryWrites=true&w=majority";
 
@@ -22,8 +21,6 @@ async function main() {
     const reserveWizardScene = new Scenes.WizardScene(
       "show",
       async (ctx) => {
-        // await client.connect()
-        // console.log('conect')
         ctx.session.data = {};
         ctx.session.data.firstName = ctx.message.from.first_name || "Anonim";
         ctx.session.data.username = ctx.message.from.username || "Anonim";
@@ -32,15 +29,7 @@ async function main() {
         );
         return ctx.wizard.next();
       },
-      // async (ctx) => {
-      //     await ctx.reply(`Введите пожалуйста ваш номер телефона`)
-      //     if (ctx.message.text) {
-      //         if (ctx.message.text) {
-      //             ctx.session.data.number = ctx.message.text
-      //             return ctx.wizard.next()
-      //         } else ctx.reply('Пожалуйста, введите только цифры!')
-      //     }
-      // },
+
       async (ctx) => {
         if (ctx.message.text) {
           if (/\d/.test(ctx.message.text))
@@ -66,6 +55,8 @@ async function main() {
           if (/\d/.test(ctx.message.text)) {
             if (ctx.message.text > 0 && ctx.message.text < 6) {
               ctx.session.data.seats = ctx.message.text;
+              const today = (ctx.session.data.date = new Date());
+              console.log(today);
               await ctx.replyWithHTML(
                 "Шаг 4: Пожалуйста, введите номер телефона.\n<i>например: 336787728</i>"
               );
@@ -78,9 +69,9 @@ async function main() {
         if (ctx.message.text) {
           if (/\d/.test(ctx.message.text)) {
             ctx.session.data.number = ctx.message.text;
-
+            console.log(ctx.session.data);
             await ctx.reply(
-              `Бронирование на имя: ${ctx.session.data.name}\nВыбранное шоу: ${ctx.session.data.show}\nКоличество забронированных мест: ${ctx.session.data.seats}\nномер:${ctx.session.data.number}`
+              `Бронирование на имя: ${ctx.session.data.name}\nВыбранное шоу: ${ctx.session.data.show}\nКоличество забронированных мест: ${ctx.session.data.seats}\nНомер:${ctx.session.data.number}`
             );
             await ctx.reply(
               "Подтвердите бронирование",
@@ -92,9 +83,7 @@ async function main() {
             reserveWizardScene.action("ok", async (ctx) => {
               try {
                 await ctx.answerCbQuery();
-                console.log(ctx.session.data);
                 ctx.reply(ctx.session.data, {
-                  // chat_id: ctx.chat.id
                   chat_id: ctx.chat.id,
                   text: "Бронирование прошло успешно",
                 });
