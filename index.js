@@ -23,7 +23,6 @@ async function main() {
       async (ctx) => {
         if (ctx.message.text == "Сброс") {
           ctx.scene.enter("begin");
-          console.log("inshala");
         } else {
           ctx.session.data = {};
           ctx.session.data.firstName = ctx.message.from.first_name || "Anonim";
@@ -36,88 +35,124 @@ async function main() {
       },
 
       async (ctx) => {
-        if (ctx.message.text == "Сброс") {
-          ctx.scene.enter("begin");
-          console.log("inshala");
+        if (
+          ctx.message.text == "Отменить бронирование" ||
+          ctx.message.text == "Выбрать шоу" ||
+          ctx.message.text == " "
+        ) {
+          await ctx.reply(
+            `Cледуйте инструкциям!\nНа чьё имя вы хотите провести бронирование`
+          );
         } else {
-          if (ctx.message.text && ctx.message.text) {
-            if (/\d/.test(ctx.message.text))
-              ctx.reply("Принимаем только имена из букв :)");
-            else {
-              ctx.session.data.name = ctx.message.text.toLowerCase();
-              await ctx.replyWithHTML(
-                "Шаг 2: назовите шоу\n<i>Можно указать несколько шоу\nнапример: Чего хотят женщины. Отчетный концерт пятница</i>"
-              );
-              return ctx.wizard.next();
-            }
-          } else ctx.reply("Принимаем только текст!");
-        }
-      },
-      async (ctx) => {
-        if (ctx.message.text == "Сброс") {
-          ctx.scene.enter("begin");
-          console.log("inshala 228");
-        } else if (ctx.message.text) {
-          ctx.session.data.show = ctx.message.text;
-          await ctx.reply("Шаг 3: Количество бронируемых мест (до 5)");
-          return ctx.wizard.next();
-        } else ctx.reply("Принимаем только текст!");
-      },
-      async (ctx) => {
-        if (ctx.message.text == "Сброс") {
-          ctx.scene.enter("begin");
-          console.log("inshala 320");
-        } else {
-          if (ctx.message.text) {
-            if (/\d/.test(ctx.message.text)) {
-              if (ctx.message.text > 0 && ctx.message.text < 6) {
-                ctx.session.data.seats = ctx.message.text;
-                const today = (ctx.session.data.date = new Date());
-                console.log(today);
+          if (ctx.message.text == "Сброс") {
+            ctx.scene.enter("begin");
+          } else {
+            if (ctx.message.text && ctx.message.text) {
+              if (/\d/.test(ctx.message.text))
+                ctx.reply("Принимаем только имена из букв :)");
+              else {
+                ctx.session.data.name = ctx.message.text.toLowerCase();
                 await ctx.replyWithHTML(
-                  "Шаг 4: Пожалуйста, введите номер телефона.\n<i>например: 336787728</i>"
+                  "Шаг 2: Назовите шоу\n<i>Можно указать несколько шоу\nнапример: Чего хотят женщины. Отчетный концерт пятница</i>"
                 );
                 return ctx.wizard.next();
-              } else ctx.reply("Отправьте число от 1 до 5!");
-            } else ctx.reply("Пожалуйста, введите только цифры!");
+              }
+            } else ctx.reply("Принимаем только текст!");
           }
         }
       },
       async (ctx) => {
-        if (ctx.message.text == "Сброс") {
-          ctx.scene.enter("begin");
-          console.log("inshala 600");
+        if (
+          ctx.message.text == "Отменить бронирование" ||
+          ctx.message.text == "Выбрать шоу" ||
+          ctx.message.text == " "
+        ) {
+          await ctx.replyWithHTML(
+            `Cледуйте инструкциям!\nНазовите шоу\n<i>Можно указать несколько шоу\nнапример: Чего хотят женщины. Отчетный концерт пятница</i>`
+          );
         } else {
-          if (ctx.message.text) {
-            if (/\d/.test(ctx.message.text)) {
-              ctx.session.data.number = ctx.message.text;
-              console.log(ctx.session.data);
-              await ctx.reply(
-                `Бронирование на имя: ${ctx.session.data.name}\nВыбранное шоу: ${ctx.session.data.show}\nКоличество забронированных мест: ${ctx.session.data.seats}\nНомер:${ctx.session.data.number}`
-              );
-              await ctx.reply(
-                "Подтвердите бронирование",
-                Markup.inlineKeyboard([
-                  [Markup.button.callback("Подтвердить", "ok")],
-                ])
-              );
+          if (ctx.message.text == "Сброс") {
+            ctx.scene.enter("begin");
+          } else if (ctx.message.text) {
+            ctx.session.data.show = ctx.message.text;
+            await ctx.reply("Шаг 3: Количество бронируемых мест (до 5)");
+            return ctx.wizard.next();
+          } else ctx.reply("Принимаем только текст!");
+        }
+      },
+      async (ctx) => {
+        if (
+          ctx.message.text == "Отменить бронирование" ||
+          ctx.message.text == "Выбрать шоу" ||
+          ctx.message.text == " "
+        ) {
+          await ctx.reply(
+            `Cледуйте инструкциям!\nУкажите количество бронируемых мест (до 5)`
+          );
+        } else {
+          if (ctx.message.text == "Сброс") {
+            ctx.scene.enter("begin");
+          } else {
+            if (ctx.message.text) {
+              if (/\d/.test(ctx.message.text)) {
+                if (ctx.message.text > 0 && ctx.message.text < 6) {
+                  ctx.session.data.seats = ctx.message.text;
+                  const today = (ctx.session.data.date = new Date());
 
-              reserveWizardScene.action("ok", async (ctx) => {
-                try {
-                  await ctx.answerCbQuery();
-                  ctx.reply(ctx.session.data, {
-                    chat_id: ctx.chat.id,
-                    text: "Бронирование прошло успешно",
-                  });
-                  const users = client.db().collection("users");
-                  await users.insertOne({ name: ctx.session.data });
-                } catch (e) {
-                  console.log("Чата не существует!");
-                }
-                return ctx.scene.leave();
-              });
-            } else ctx.reply("Пожалуйста, введите только цифры!");
-          } else ctx.reply("только цифры!");
+                  await ctx.replyWithHTML(
+                    "Шаг 4: Пожалуйста, введите номер телефона.\n<i>например: 336787728</i>"
+                  );
+                  return ctx.wizard.next();
+                } else ctx.reply("Отправьте число от 1 до 5!");
+              } else ctx.reply("Пожалуйста, вводите только цифры!");
+            }
+          }
+        }
+      },
+      async (ctx) => {
+        if (
+          ctx.message.text == "Отменить бронирование" ||
+          ctx.message.text == "Выбрать шоу" ||
+          ctx.message.text == " "
+        ) {
+          await ctx.replyWithHTML(
+            `Cледуйте инструкциям!\nПожалуйста, введите номер телефона.\n<i>например: 336787728</i>`
+          );
+        } else {
+          if (ctx.message.text == "Сброс") {
+            ctx.scene.enter("begin");
+          } else {
+            if (ctx.message.text) {
+              if (/\d/.test(ctx.message.text)) {
+                ctx.session.data.number = ctx.message.text;
+
+                await ctx.reply(
+                  `Бронирование на имя: ${ctx.session.data.name}\nВыбранное шоу: ${ctx.session.data.show}\nКоличество забронированных мест: ${ctx.session.data.seats}\nНомер:${ctx.session.data.number}`
+                );
+                await ctx.reply(
+                  "Подтвердите бронирование",
+                  Markup.inlineKeyboard([
+                    [Markup.button.callback("Подтвердить", "ok")],
+                  ])
+                );
+
+                reserveWizardScene.action("ok", async (ctx) => {
+                  try {
+                    await ctx.answerCbQuery();
+                    ctx.reply(ctx.session.data, {
+                      chat_id: ctx.chat.id,
+                      text: "Бронирование прошло успешно",
+                    });
+                    const users = client.db().collection("users");
+                    await users.insertOne({ name: ctx.session.data });
+                  } catch (e) {
+                    console.log("Чата не существует!");
+                  }
+                  return ctx.scene.leave();
+                });
+              } else ctx.reply("Пожалуйста, введите только цифры!");
+            } else ctx.reply("только цифры!");
+          }
         }
       }
     );
