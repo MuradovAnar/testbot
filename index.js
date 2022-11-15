@@ -75,7 +75,7 @@ async function main() {
             ctx.scene.enter("begin");
           } else if (ctx.message.text) {
             ctx.session.data.show = ctx.message.text;
-            await ctx.reply("Шаг 3: Количество бронируемых мест (до 5)");
+            await ctx.reply("Шаг 3: Количество бронируемых мест (до 8)");
             return ctx.wizard.next();
           } else ctx.reply("Принимаем только текст!");
         }
