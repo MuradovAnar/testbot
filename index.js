@@ -163,7 +163,6 @@ async function main() {
         ctx.session.data = {};
         ctx.session.data.firstName = ctx.message.from.first_name || "Anonim";
         ctx.session.data.username = ctx.message.from.username || "Anonim";
-        // ctx.session.data.cancellation = ctx.message.text;
 
         await ctx.replyWithHTML(
           `Здравствуйте ${ctx.session.data.username}. Укажите, пожалуйста, на какое имя было произведено бронирование, номер телефооа и название шоу\n<i>например: Ирина, 336787728, чего хотят женщины</i> `
@@ -185,8 +184,6 @@ async function main() {
           ctx.replyWithHTML(
             `Заполните форму по образцу! Укажите, пожалуйста, на какое имя было произведено бронирование, номер телефооа и название шоу\n<i>например: Ирина, 336787728, чего хотят женщины</i> `
           );
-          console.log(ctx.session.data.cancellation);
-          // return ctx.wizard.next();
         } else if (ctx.message.text == "Сброс") {
           ctx.scene.enter("begin");
           console.log("inshala");
@@ -199,8 +196,6 @@ async function main() {
               [Markup.button.callback("Подтвердить", "cancel")],
             ])
           );
-
-          // console.log(ctx.message.text);
 
           cancelWizardScene.action("cancel", async (ctx) => {
             try {
@@ -221,10 +216,8 @@ async function main() {
     );
 
     const startlWizardScene = new Scenes.WizardScene("begin", async (ctx) => {
-      console.log("Вы вошли в сцену startlWizardScene");
       if (ctx.message.text == "Сброс") {
         bot.start;
-        // console.log("что то странное");
         await client.connect();
         console.log("conect");
         await ctx.replyWithHTML(
