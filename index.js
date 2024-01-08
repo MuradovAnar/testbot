@@ -27,6 +27,7 @@ async function main() {
           ctx.session.data = {};
           ctx.session.data.firstName = ctx.message.from.first_name || "Anonim";
           ctx.session.data.username = ctx.message.from.username || "Anonim";
+
           await ctx.reply(
             `шаг 1: Здравствуйте ${ctx.session.data.username}. На какое имя вы хотите провести бронирование`
           );
@@ -271,6 +272,22 @@ async function main() {
         case "Сброс":
           ctx.scene.enter("begin");
           break;
+      }
+    });
+
+    bot.catch((error) => {
+      console.error(`Ошибка: ${error}`);
+    });
+
+    process.on("unhandledRejection", (reason, promise) => {
+      console.error("Unhandled Rejection at:", promise, "reason:", reason);
+
+      if (
+        reason?.message.includes("bot was blocked by the user") ||
+        reason?.code === 403
+      ) {
+        console.error("Бот был заблокирован пользователем.");
+        // Здесь можно принять меры по обработке блокировки
       }
     });
 
